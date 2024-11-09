@@ -1,6 +1,6 @@
 import path from 'path';
 import Url from 'url';
-import { AppEvents } from 'nocodb-sdk';
+import { AppEvents, PublicAttachmentScope } from 'nocodb-sdk';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import slash from 'slash';
@@ -50,17 +50,27 @@ export class AttachmentsService {
     private readonly jobsService: IJobsService,
   ) {}
 
-  async upload(param: { files: FileType[]; req?: NcRequest; path?: string }) {
+  async upload(param: {
+    files: FileType[];
+    req?: NcRequest;
+    path?: string;
+    scope?: PublicAttachmentScope;
+  }) {
     const userId = param.req?.user.id || 'anonymous';
 
-    param.path =
-      param.path || `${moment().format('YYYY/MM/DD')}/${hash(userId)}`;
+    param.path = param.scope
+      ? `${hash(userId)}`
+      : param.path || `${moment().format('YYYY/MM/DD')}/${hash(userId)}`;
 
     // TODO: add getAjvValidatorMw
     const filePath = this.sanitizeUrlPath(
       param.path?.toString()?.split('/') || [''],
     );
-    const destPath = path.join('nc', 'uploads', ...filePath);
+    const _destPath = path.join(
+      'nc',
+      param.scope ? param.scope : 'uploads',
+      ...filePath,
+    );
 
     const storageAdapter = await NcPluginMgrv2.storageAdapter();
 
@@ -77,10 +87,18 @@ export class AttachmentsService {
     queue.addAll(
       param.files?.map((file) => async () => {
         try {
+          const destPath = param.scope
+            ? path.join(_destPath, `${nanoid(5)}`)
+            : _destPath;
+
           const originalName = utf8ify(file.originalname);
-          const fileName = `${normalizeFilename(
-            path.parse(originalName).name,
-          )}_${nanoid(5)}${path.extname(originalName)}`;
+          const fileName = param.scope
+            ? `${normalizeFilename(
+                path.parse(originalName).name,
+              )}${path.extname(originalName)}`
+            : `${normalizeFilename(path.parse(originalName).name)}_${nanoid(
+                5,
+              )}${path.extname(originalName)}`;
 
           const tempMetadata: {
             width?: number;
@@ -183,16 +201,23 @@ export class AttachmentsService {
     urls: AttachmentReqType[];
     req?: NcRequest;
     path?: string;
+    scope?: PublicAttachmentScope;
   }) {
     const userId = param.req?.user.id || 'anonymous';
 
-    param.path =
-      param.path || `${moment().format('YYYY/MM/DD')}/${hash(userId)}`;
+    param.path = param.scope
+      ? `${hash(userId)}`
+      : param.path || `${moment().format('YYYY/MM/DD')}/${hash(userId)}`;
 
     const filePath = this.sanitizeUrlPath(
       param?.path?.toString()?.split('/') || [''],
     );
-    const destPath = path.join('nc', 'uploads', ...filePath);
+
+    const _destPath = path.join(
+      'nc',
+      param.scope ? param.scope : 'uploads',
+      ...filePath,
+    );
 
     const storageAdapter = await NcPluginMgrv2.storageAdapter();
 
@@ -211,6 +236,10 @@ export class AttachmentsService {
         try {
           const { url, fileName: _fileName } = urlMeta;
 
+          const destPath = param.scope
+            ? path.join(_destPath, `${nanoid(5)}`)
+            : _destPath;
+
           let mimeType,
             response,
             size,
@@ -227,9 +256,13 @@ export class AttachmentsService {
           const decodedPath = decodeURIComponent(parsedUrl.pathname);
           const fileNameWithExt = _fileName || path.basename(decodedPath);
 
-          const fileName = `${normalizeFilename(
-            path.parse(fileNameWithExt).name,
-          )}_${nanoid(5)}${path.extname(fileNameWithExt)}`;
+          const fileName = param.scope
+            ? `${normalizeFilename(
+                path.parse(fileNameWithExt).name,
+              )}${path.extname(fileNameWithExt)}`
+            : `${normalizeFilename(path.parse(fileNameWithExt).name)}_${nanoid(
+                5,
+              )}${path.extname(fileNameWithExt)}`;
 
           if (!mimeType) {
             mimeType = mimetypes[path.extname(fileNameWithExt).slice(1)];

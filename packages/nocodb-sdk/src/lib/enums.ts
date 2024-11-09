@@ -432,3 +432,9 @@ export enum IntegrationCategoryType {
   STORAGE = 'storage',
   OTHERS = 'others',
 }
+
+export enum PublicAttachmentScope {
+  WORKSPACEPICS = 'workspacePics',
+  PROFILEPICS = 'profilePics',
+  ORGANIZATIONPICS = 'organizationPics',
+}
