@@ -233,14 +233,14 @@ export class AttachmentsService {
       ? `${hash(userId)}`
       : param.path || `${moment().format('YYYY/MM/DD')}/${hash(userId)}`;
 
-    const _filePath = this.sanitizeUrlPath(
+    const filePath = this.sanitizeUrlPath(
       param?.path?.toString()?.split('/') || [''],
     );
 
-    const _destPath = path.join(
+    const destPath = path.join(
       'nc',
       param.scope ? param.scope : 'uploads',
-      ..._filePath,
+      ...filePath,
     );
 
     const storageAdapter = await NcPluginMgrv2.storageAdapter();
@@ -263,13 +263,14 @@ export class AttachmentsService {
           const nanoId = nanoid(5);
 
           const filePath = this.sanitizeUrlPath([
+            ...(param.scope ? [param.scope] : []),
             ...(param?.path?.toString()?.split('/') || ['']),
             ...(param.scope ? [nanoId] : []),
           ]);
 
-          const destPath = param.scope
-            ? path.join(_destPath, `${nanoId}`)
-            : _destPath;
+          const fileDestPath = param.scope
+            ? path.join(destPath, `${nanoId}`)
+            : destPath;
 
           let mimeType,
             response,
@@ -301,7 +302,7 @@ export class AttachmentsService {
 
           const { url: attachmentUrl, data: file } =
             await storageAdapter.fileCreateByUrl(
-              slash(path.join(destPath, fileName)),
+              slash(path.join(fileDestPath, fileName)),
               finalUrl,
               {
                 fetchOptions: {
