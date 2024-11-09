@@ -31,3 +31,7 @@ export const modalSizes = {
  * ```
  */
 export const ncDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export const isUnicodeEmoji = (emoji: string) => {
+  return !!emoji?.match(/(\p{Emoji}|\p{Extended_Pictographic})/gu)
+}
