@@ -194,6 +194,7 @@ export class AttachmentsService {
           workspace_id: RootScopes.ROOT,
         },
         attachments: generateThumbnail,
+        scope: param.scope,
       });
     }
 
@@ -377,6 +378,7 @@ export class AttachmentsService {
           workspace_id: RootScopes.ROOT,
         },
         attachments: generateThumbnail,
+        scope: param.scope,
       });
     }
 

@@ -1,4 +1,4 @@
-import type { AttachmentResType, UserType } from 'nocodb-sdk';
+import type { AttachmentResType, PublicAttachmentScope, UserType } from 'nocodb-sdk';
 import type { NcContext, NcRequest } from '~/interface/config';
 export const JOBS_QUEUE = 'jobs';
 
@@ -149,4 +149,5 @@ export interface DataExportJobData extends JobData {
 
 export interface ThumbnailGeneratorJobData extends JobData {
   attachments: AttachmentResType[];
+  scope?: PublicAttachmentScope;
 }
