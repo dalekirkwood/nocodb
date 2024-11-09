@@ -221,6 +221,7 @@ const [useProvideExtensionHelper, useExtensionHelper] = useInjectionState(
       tables,
       showExpandBtn,
       fullscreenModalSize,
+      eventBus,
       getViewsForTable,
       getData,
       getTableMeta,
