@@ -453,10 +453,6 @@ export const useExtensions = createSharedComposable(() => {
     } catch (error) {
       console.error('Error loading extensions:', error)
     }
-
-    if (isEeUI) {
-      extensionsEgg.value = true
-    }
   })
 
   watch(
