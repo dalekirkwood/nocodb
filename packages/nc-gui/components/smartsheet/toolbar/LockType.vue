@@ -51,7 +51,7 @@ const selectedView = inject(ActiveViewInj)
           </div>
           <div v-if="!hideTick" class="flex flex-grow"></div>
           <template v-if="!hideTick">
-            <GeneralIcon v-if="selectedView?.lock_type === type" icon="check" class="!text-brand-500" />
+            <GeneralIcon v-if="selectedView?.lock_type === type" icon="circleCheckSolid" class="!text-brand-500 h-4 w-4 flex-none" />
             <span v-else />
           </template>
         </div>
