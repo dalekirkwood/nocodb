@@ -67,6 +67,8 @@ const onImportClick = (dialog: any) => {
   dialog.value = true
 }
 
+const isOpenLockViewDlg = ref(false)
+
 async function changeLockType(type: LockType) {
   $e('a:grid:lockmenu', { lockType: type, sidebar: props.inSidebar })
 
@@ -98,17 +100,6 @@ async function changeLockType(type: LockType) {
   }
 
   emits('closeModal')
-}
-
-const isOpenLockViewDlg = ref(false)
-
-const onLockViewClick = () => {
-  $e('a:grid:lockmenu', { lockType: LockType.Locked, sidebar: props.inSidebar })
-
-  if (!view.value || view.value?.lock_type === LockType.Locked) return
-
-  emits('closeModal')
-  isOpenLockViewDlg.value = true
 }
 
 const isOnDuplicateLoading = ref<boolean>(false)
@@ -330,7 +321,7 @@ const onDelete = async () => {
         </a-menu-item>
 
         <a-menu-item class="!mx-1 !py-2 !rounded-md nc-view-action-lock-subaction">
-          <LazySmartsheetToolbarLockType :type="LockType.Locked" @click="onLockViewClick()" />
+          <LazySmartsheetToolbarLockType :type="LockType.Locked" @click="changeLockType(LockType.Locked)" />
         </a-menu-item>
       </NcSubMenu>
     </template>
