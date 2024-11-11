@@ -452,7 +452,6 @@ onMounted(async () => {
 const isCalendarReadonly = (calendarRange?: Array<{ fk_from_column_id: string; fk_to_column_id: string | null }>) => {
   if (!calendarRange) return false
   return calendarRange.some((range) => {
-    console.log(range)
     const column = viewSelectFieldOptions.value?.find((c) => c.value === range?.fk_from_column_id)
     return !column || ![UITypes.DateTime, UITypes.Date].includes(column.uidt)
   })
