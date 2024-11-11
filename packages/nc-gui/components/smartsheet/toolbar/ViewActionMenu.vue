@@ -36,6 +36,8 @@ const { refreshCommandPalette } = useCommandPalette()
 
 const lockType = computed(() => (view.value?.lock_type as LockType) || LockType.Collaborative)
 
+const changeType = ref<LockType>()
+
 const isViewIdCopied = ref(false)
 
 const currentSourceId = computed(() => table.value?.source_id)
@@ -68,12 +70,21 @@ const onImportClick = (dialog: any) => {
 async function changeLockType(type: LockType) {
   $e('a:grid:lockmenu', { lockType: type, sidebar: props.inSidebar })
 
-  if (!view.value) return
+  if (!view.value || view.value?.lock_type === type) return
 
   if (type === 'personal') {
     // Coming soon
     return message.info(t('msg.toast.futureRelease'))
   }
+
+  if (type === LockType.Locked || view.value.lock_type === LockType.Locked) {
+    emits('closeModal')
+
+    changeType.value = type
+    isOpenLockViewDlg.value = true
+    return
+  }
+
   try {
     view.value.lock_type = type
     await $api.dbView.update(view.value.id as string, {
@@ -356,7 +367,7 @@ const onDelete = async () => {
         :source-id="currentSourceId"
       />
     </template>
-    <LazyDlgLockeView v-model="isOpenLockViewDlg" />
+    <LazyDlgLockeView v-model="isOpenLockViewDlg" :change-type="changeType" :view="view" />
   </NcMenu>
   <span v-else></span>
 </template>
