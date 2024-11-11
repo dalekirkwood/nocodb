@@ -275,7 +275,14 @@ watch(isDropdownOpen, async () => {
         @blur="onRename"
         @keydown.stop="onKeyDown($event)"
       />
-      <NcTooltip v-else class="nc-sidebar-node-title text-ellipsis overflow-hidden select-none w-full" show-on-truncate-only>
+      <NcTooltip
+        v-else
+        class="nc-sidebar-node-title text-ellipsis overflow-hidden select-none max-w-full"
+        :class="{
+          'w-full': vModel?.lock_type !== LockType.Locked,
+        }"
+        show-on-truncate-only
+      >
         <template #title> {{ vModel.alias || vModel.title }}</template>
         <div
           data-testid="sidebar-view-title"
@@ -287,6 +294,10 @@ watch(isDropdownOpen, async () => {
           {{ vModel.alias || vModel.title }}
         </div>
       </NcTooltip>
+
+      <div v-if="!isEditing && vModel?.lock_type === LockType.Locked" class="flex-1 flex">
+        <GeneralIcon icon="ncLock" class="w-4 h-4 flex-none text-nc-content-gray-muted" />
+      </div>
 
       <template v-if="!isEditing && !isLocked">
         <NcTooltip v-if="vModel.description?.length" placement="bottom">
